@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Kalam:wght@400;700&family=Karla:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Press+Start+2P&family=Kalam:wght@400;700&family=Karla:wght@400;500;600&display=swap">
 <style>
   /* Layout: één lange papieren kaart; een bloesemtak groeit mee met het scrollen en draagt aan elk twijgje een kraftpapieren label. */
   :root {
@@ -89,7 +89,7 @@
   @keyframes zak { 0%,100% { transform: translateY(0); opacity: .6 } 50% { transform: translateY(8px); opacity: 1 } }
 
   /* ---------- De tak ---------- */
-  .takzone { padding-block: 0; }
+  .takzone { padding-block: 0; overflow-x: clip; }
   .stage {
     position: relative;
     max-width: 980px;
@@ -239,28 +239,125 @@
   .namen li + li::before { content: "·"; margin-right: 18px; color: var(--lilac); }
 
   /* ---------- Spelletje ---------- */
-  .spel { padding-block: 24px 96px; }
-  .spel-kaart {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 36px 28px;
-    border-radius: 22px;
-    background: #fff;
-    border: 2px dashed #e3c3d3;
+  .spel { padding-block: 24px 96px; display: grid; justify-items: center; gap: 18px; }
+  .spel-kop { text-align: center; display: grid; gap: 8px; justify-items: center; }
+  .spel-kop .eyebrow { color: var(--lilac); }
+  .spel-kop h3 {
+    font-family: "Press Start 2P", monospace;
+    font-weight: 400;
+    font-size: clamp(1.1rem, 4.4vw, 1.6rem);
+    line-height: 1.3;
+    margin: 0;
+    color: var(--rose);
+    text-shadow: 2px 2px 0 #fbd3e3;
+  }
+  .spel-kop p { margin: 0; color: var(--ink-soft); max-width: 34em; }
+  .spel-kast {
+    width: 100%;
+    max-width: 768px;
+    padding: 10px;
+    border-radius: 20px;
+    background: linear-gradient(160deg, #5b3a63, var(--ink));
+    box-shadow: 0 14px 30px rgba(62, 35, 64, .25);
+  }
+  .spel-scherm {
+    position: relative;
+    aspect-ratio: 256 / 224;
+    max-width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fde3ee;
+    outline: none;
+  }
+  .spel-scherm:focus-visible { box-shadow: 0 0 0 3px #f3aac7; }
+  #spelCanvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; touch-action: none; cursor: pointer; }
+  .spel-einde {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 14px;
+    background: rgba(62, 35, 64, .55);
+  }
+  .spel-einde[hidden] { display: none; }
+  .einde-kaart {
+    width: min(100%, 380px);
+    max-height: 100%;
+    overflow: auto;
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: var(--paper);
     text-align: center;
     display: grid;
-    gap: 10px;
-    justify-items: center;
+    gap: 8px;
   }
-  .spel-kaart .eyebrow { color: var(--lilac); }
-  .spel-kaart h3 {
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: 2rem;
-    line-height: 1.1;
-    margin: 0;
+  .einde-kaart h4 { margin: 0; font-family: "Press Start 2P", monospace; font-weight: 400; font-size: .95rem; color: var(--rose); line-height: 1.4; }
+  .einde-kaart .score { margin: 0; font-size: .9rem; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .einde-label {
+    margin: 4px 0;
+    padding: 14px 16px;
+    background: linear-gradient(170deg, #f1e0c4, var(--kraft));
+    border: 1px solid var(--kraft-edge);
+    border-radius: 4px;
+    text-align: left;
+    transform: rotate(-1deg);
   }
-  .spel-kaart p { margin: 0; color: var(--ink-soft); max-width: 30em; }
+  .einde-label .wens { font-size: 1.05rem; margin-block-end: 6px; }
+  .einde-label .van { font-size: .95rem; }
+  .einde-kaart .extra { margin: 0; font-size: .85rem; color: var(--ink-soft); }
+  .einde-knoppen { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .spel-knop.tweede { background: transparent; color: var(--ink); }
+  .spel-knop {
+    font: 600 .9rem var(--body);
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    background: var(--rose);
+    color: #fff;
+    cursor: pointer;
+    justify-self: center;
+  }
+  .spel-knop:focus-visible, .spel-balk button:focus-visible { outline: 3px solid #f3aac7; outline-offset: 2px; }
+  .spel-balk {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    font-size: .82rem;
+    color: #e9d6ee;
+  }
+  .spel-balk button {
+    font: 600 .82rem var(--body);
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #9c7aa8;
+    background: transparent;
+    color: #f6eaf8;
+    cursor: pointer;
+  }
+  .spel-balk button[aria-pressed="true"] { background: #f3aac7; color: var(--ink); border-color: #f3aac7; }
+  .spel-balk .uitleg { flex-basis: 100%; text-align: center; }
+  .touch { display: none; justify-content: space-between; gap: 8px; margin-top: 10px; user-select: none; -webkit-user-select: none; }
+  .touch .kruis, .touch .ab { display: flex; gap: 6px; align-items: center; }
+  .touch button {
+    width: 48px; height: 52px;
+    border-radius: 14px;
+    border: 2px solid #9c7aa8;
+    background: #4a2e52;
+    color: #f6eaf8;
+    font: 700 1.1rem var(--body);
+    touch-action: none;
+  }
+  .touch .ab button { border-radius: 50%; width: 56px; height: 56px; background: var(--rose); border-color: #f3aac7; color: #fff; }
+  .touch .ab button.ren { background: var(--lilac); border-color: #c9b0e8; }
+  .touch button.in { transform: translateY(2px); filter: brightness(1.2); }
+  .touch .klein { width: 38px; }
+  @media (pointer: coarse) {
+    .touch { display: flex; }
+    .spel-balk .toetsen { display: none; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .scroll-hint svg { animation: none; }
@@ -294,10 +391,47 @@
 </section>
 
 <section class="spel gutter" id="spel">
-  <div class="spel-kaart">
+  <div class="spel-kop">
     <p class="eyebrow">Even iets anders</p>
-    <h3>Hier komt straks een spelletje</h3>
-    <p>Een klein spel om je gedachten even te verzetten. Wat het precies wordt, volgt nog.</p>
+    <h3>Bloesemland</h3>
+    <p>Een klein spel om je gedachten te verzetten. Tien tuinen, één van elk kernteamlid. Verzamel bloemkelkjes, vind in elke tuin vijf fladderende kaartjes en haal aan het eind een wens op.</p>
+  </div>
+  <div class="spel-kast">
+    <div class="spel-scherm" id="spelScherm" tabindex="0" aria-label="Bloesemland, het spel. Klik of tik om te starten.">
+      <canvas id="spelCanvas" width="256" height="224"></canvas>
+      <div class="spel-einde" id="spelEinde" hidden>
+        <div class="einde-kaart">
+          <h4 id="spelTitel">Gehaald!</h4>
+          <p class="score" id="spelScore"></p>
+          <div class="einde-label" id="spelLabel"><p class="wens" id="spelWens"></p><p class="van" id="spelVan"></p></div>
+          <p class="extra" id="spelExtra"></p>
+          <div class="einde-knoppen">
+            <button class="spel-knop" id="spelNaarKaart" type="button">Volgend level</button>
+            <button class="spel-knop tweede" id="spelOpnieuw" type="button">Nog een keer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="touch" aria-hidden="true">
+      <div class="kruis">
+        <button type="button" data-knop="left">◀</button>
+        <button type="button" class="klein" data-knop="up">▲</button>
+        <button type="button" class="klein" data-knop="down">▼</button>
+        <button type="button" data-knop="right">▶</button>
+      </div>
+      <div class="ab">
+        <button type="button" class="ren" data-knop="run">B</button>
+        <button type="button" data-knop="jump">A</button>
+      </div>
+    </div>
+    <div class="spel-balk">
+      <button type="button" id="spelRustig" data-modus="rustig" aria-pressed="true">Rustig</button>
+      <button type="button" data-modus="uitdaging" aria-pressed="false">Uitdaging</button>
+      <button type="button" id="spelGeluid" aria-pressed="true">Geluid aan</button>
+      <button type="button" id="spelKaartKnop">Wereldkaart</button>
+      <span class="uitleg toetsen">Pijltjes lopen en klimmen · spatie springt (vasthouden = hoger) · shift rent · P pauzeert</span>
+      <span class="uitleg">Rustig: je verliest geen hartjes. Uitdaging: met hartjes en een klok.</span>
+    </div>
   </div>
 </section>
 
@@ -694,3 +828,5 @@
   });
   if (document.fonts) document.fonts.ready.then(update);
 </script>
+<script src="levels.js"></script>
+<script src="spel.js"></script>

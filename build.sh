@@ -12,5 +12,6 @@ mkdir -p docs
   cat index.html
   printf '\n</body>\n</html>\n'
 } > docs/index.html
+cp spel.js levels.js docs/
 touch docs/.nojekyll
 echo "docs/index.html gebouwd"
