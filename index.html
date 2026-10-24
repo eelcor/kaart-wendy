@@ -1,0 +1,696 @@
+<title>Lieve Wendy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Kalam:wght@400;700&family=Karla:wght@400;500;600&display=swap">
+<style>
+  /* Layout: één lange papieren kaart; een bloesemtak groeit mee met het scrollen en draagt aan elk twijgje een kraftpapieren label. */
+  :root {
+    --paper: #fbf4f5;
+    --paper-deep: #f4e6ea;
+    --ink: #3e2340;
+    --ink-soft: #7a5a78;
+    --rose: #c2557f;
+    --lilac: #9c72cf;
+    --branch: #5d4535;
+    --kraft: #e9d4b5;
+    --kraft-edge: #cbb089;
+    --string: #9a8061;
+
+    --display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+    --hand: "Kalam", "Segoe Print", "Bradley Hand", cursive;
+    --body: "Karla", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  html { background: var(--paper); }
+  body {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, #fde9f0 0%, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 100% 60%, #f1e8fb 0%, transparent 70%),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .gutter {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  /* ---------- Voorkant ---------- */
+  .voorkant {
+    min-height: 88svh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding-block: 64px 24px;
+  }
+  .voorkant-inner { display: grid; justify-items: center; gap: 18px; max-width: 760px; }
+  #sprig { width: min(300px, 76vw); height: auto; overflow: visible; }
+  .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    margin: 0;
+    line-height: 0.95;
+    text-wrap: balance;
+  }
+  h1 .naam {
+    display: block;
+    font-style: italic;
+    font-size: clamp(4rem, 15vw, 8.5rem);
+    color: var(--rose);
+  }
+  h1 .regel {
+    display: block;
+    font-size: clamp(2rem, 6.4vw, 3.6rem);
+    margin-top: 0.15em;
+  }
+  .scroll-hint {
+    margin-top: 28px;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    font-family: var(--hand);
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+  }
+  .scroll-hint svg { animation: zak 2.2s ease-in-out infinite; }
+  @keyframes zak { 0%,100% { transform: translateY(0); opacity: .6 } 50% { transform: translateY(8px); opacity: 1 } }
+
+  /* ---------- De tak ---------- */
+  .takzone { padding-block: 0; }
+  .stage {
+    position: relative;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  #takSvg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  /* Takken groeien via een masker; bladeren en kelkjes schalen vanuit hun voet, daarna gaan de kroonblaadjes open. */
+  .reveal { transition: stroke-dashoffset 1.3s cubic-bezier(.4,.1,.3,1) var(--d, 0s); }
+  .reveal.on { stroke-dashoffset: 0 !important; }
+
+  .grow {
+    transform: scale(0);
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transition: transform 1.1s cubic-bezier(.2,.9,.25,1.2) var(--d, 0s);
+  }
+  .grow.leaf { transform-origin: 0% 50%; }
+  .grow.on { transform: scale(1); }
+
+  .pt {
+    transform: rotate(var(--c));
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    transition: transform 1.8s cubic-bezier(.25,1.15,.4,1) calc(var(--d, 0s) + .8s);
+  }
+  .fl.opens.on .pt { transform: rotate(var(--o)); }
+  .stam { opacity: 0; transition: opacity 1.2s ease calc(var(--d, 0s) + 1.5s); }
+  .fl.on .stam { opacity: 1; }
+
+  .hang {
+    position: absolute;
+    width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: 50% 0;
+    opacity: 0;
+    filter: drop-shadow(0 6px 10px rgba(62, 35, 64, 0.16));
+  }
+  .hang.on {
+    opacity: 1;
+    animation:
+      vallen 1.1s cubic-bezier(.3,1.4,.5,1) var(--delay, .5s) both,
+      wiegen var(--swing, 5.5s) ease-in-out calc(var(--delay, .5s) + 1.1s) infinite;
+  }
+  @keyframes vallen {
+    from { opacity: 0; transform: translateY(-22px) rotate(-9deg); }
+    to   { opacity: 1; transform: translateY(0) rotate(0); }
+  }
+  @keyframes wiegen {
+    0%, 100% { transform: rotate(0deg); }
+    30% { transform: rotate(2.4deg); }
+    70% { transform: rotate(-2deg); }
+  }
+  .touw {
+    width: 2px;
+    height: var(--len, 56px);
+    margin: 0 auto;
+    background: repeating-linear-gradient(180deg, var(--string) 0 3px, #b59b7a 3px 5px);
+    border-radius: 2px;
+  }
+  /* Langwerpig label: rechtop hangend, tekst gedraaid langs de lengte (van boven naar beneden). */
+  .label {
+    position: relative;
+    flex: none;
+    margin-top: -8px;
+    writing-mode: vertical-rl;
+    block-size: auto;
+    inline-size: var(--lengte, 300px);
+    min-inline-size: 0;
+    padding: 46px 18px 22px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 29px, rgba(154,128,97,.13) 29px 30px),
+      linear-gradient(170deg, #f1e0c4 0%, var(--kraft) 55%, #e0c7a2 100%);
+    clip-path: polygon(24px 0, calc(100% - 24px) 0, 100% 26px, 100% 100%, 0 100%, 0 26px);
+    transform: rotate(var(--rot, 0deg));
+    transform-origin: 50% 14px;
+    color: var(--ink);
+  }
+  .label::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    clip-path: inherit;
+    box-shadow: inset 0 0 0 1px var(--kraft-edge);
+    pointer-events: none;
+  }
+  .gat {
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: 0 0 0 4px #f6ead6, 0 0 0 5px var(--kraft-edge), inset 0 1px 2px rgba(0,0,0,.15);
+  }
+  .wens {
+    white-space: pre-line;
+    font-family: var(--hand);
+    font-size: 1.22rem;
+    line-height: 1.45;
+    margin: 0;
+    margin-block-end: 10px;
+  }
+  .van {
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--rose);
+    text-align: end;
+  }
+  .label.placeholder .wens { color: var(--ink-soft); }
+
+  /* ---------- Slot ---------- */
+  .slot {
+    text-align: center;
+    padding-block: 40px 56px;
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+  }
+  .slot h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 7vw, 3.6rem);
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .slot h2 em { color: var(--rose); }
+  .slot p { margin: 0; max-width: 34em; color: var(--ink-soft); }
+  .namen {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 18px;
+    font-family: var(--hand);
+    font-size: 1.15rem;
+    color: var(--ink);
+  }
+  .namen li + li::before { content: "·"; margin-right: 18px; color: var(--lilac); }
+
+  /* ---------- Spelletje ---------- */
+  .spel { padding-block: 24px 96px; }
+  .spel-kaart {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 36px 28px;
+    border-radius: 22px;
+    background: #fff;
+    border: 2px dashed #e3c3d3;
+    text-align: center;
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+  }
+  .spel-kaart .eyebrow { color: var(--lilac); }
+  .spel-kaart h3 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 2rem;
+    line-height: 1.1;
+    margin: 0;
+  }
+  .spel-kaart p { margin: 0; color: var(--ink-soft); max-width: 30em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-hint svg { animation: none; }
+    .grow, .reveal, .pt, .stam { transition: none; }
+    .hang.on { animation: none; }
+  }
+</style>
+
+<header class="voorkant gutter">
+  <div class="voorkant-inner">
+    <svg id="sprig" viewBox="0 0 280 130" aria-hidden="true"></svg>
+    <p class="eyebrow">Van het kernteam</p>
+    <h1><span class="naam">Lieve Wendy,</span><span class="regel">we denken aan je…</span></h1>
+    <div class="scroll-hint" aria-hidden="true">
+      <span>scroll maar rustig verder</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M5 12l7 7 7-7"/></svg>
+    </div>
+  </div>
+</header>
+
+<section class="takzone gutter" aria-label="Wensen van het kernteam">
+  <div class="stage" id="stage">
+    <svg id="takSvg" aria-hidden="true"></svg>
+  </div>
+</section>
+
+<section class="slot gutter">
+  <h2>Heel veel liefs,<br><em>en weet dat we er zijn.</em></h2>
+  <p>We sturen je kracht, rust en een hele tak vol bloesem. Je hoeft niets terug te doen.</p>
+  <ul class="namen" id="namen"></ul>
+</section>
+
+<section class="spel gutter" id="spel">
+  <div class="spel-kaart">
+    <p class="eyebrow">Even iets anders</p>
+    <h3>Hier komt straks een spelletje</h3>
+    <p>Een klein spel om je gedachten even te verzetten. Wat het precies wordt, volgt nog.</p>
+  </div>
+</section>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
+
+<script>
+  // Vul hier de wensen in. Volgorde = volgorde aan de tak.
+  const WENSEN = [
+    // 'groet' (optioneel) vervangt de ondertekening "— naam" onderaan het label.
+    { van: "Mirjam", wens: "Beste Wendy,\nDit is even schrikken! Veel sterkte komende tijd,", groet: "hartelijke groet, Mirjam" },
+    { van: "Teamlid 2", wens: "Hier komt de wens van teamlid 2." },
+    { van: "Teamlid 3", wens: "Hier komt de wens van teamlid 3." },
+    { van: "Teamlid 4", wens: "Hier komt de wens van teamlid 4." },
+    { van: "Teamlid 5", wens: "Hier komt de wens van teamlid 5." },
+    { van: "Eelco", wens: "Lieve Wendy, was even stil van het nieuws. Heel veel sterkte en liefs voor jou en je gezin de komende tijd,", groet: "liefs, Eelco" },
+    { van: "Teamlid 7", wens: "Hier komt de wens van teamlid 7." },
+    { van: "Teamlid 8", wens: "Hier komt de wens van teamlid 8." },
+  ];
+
+  // Kelkkleuren: diep (voet van het blad), midden, licht (punt).
+  const KLEUR = [
+    { deep: "#b8457a", mid: "#e98ab3", light: "#fbd3e3" },
+    { deep: "#7d55b8", mid: "#b99be3", light: "#ebe0fa" },
+    { deep: "#5e3592", mid: "#9a70cf", light: "#d8c4f1" },
+    { deep: "#cf6f97", mid: "#f3aac7", light: "#fde4ee" },
+    { deep: "#9b3d86", mid: "#d68ac6", light: "#f6d6ee" },
+  ];
+  const BAST = "#5d4535", BAST_LICHT = "#80614b";
+  const NS = "http://www.w3.org/2000/svg";
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Klein seeded random, zodat de tak bij elke resize hetzelfde blijft.
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pick = arr => arr[Math.floor(rnd() * arr.length)];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const rad = d => d * Math.PI / 180;
+
+  function el(tag, attrs = {}, parent) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  (function verlopen() {
+    const defs = document.getElementById("defs");
+    const grad = (id, a, b) => {
+      const g = el("linearGradient", { id, x1: 0, y1: 1, x2: 0, y2: 0 }, defs);
+      el("stop", { offset: 0, "stop-color": a }, g);
+      el("stop", { offset: 1, "stop-color": b }, g);
+    };
+    KLEUR.forEach((k, i) => { k.i = i; grad(`pb${i}`, k.deep, k.mid); grad(`pf${i}`, k.mid, k.light); });
+  })();
+
+  // ---------- Geometrie ----------
+  function at(path, frac) {
+    const L = path.getTotalLength(), l = L * frac;
+    const p = path.getPointAtLength(l);
+    const q = path.getPointAtLength(Math.min(L, l + 1)), r = path.getPointAtLength(Math.max(0, l - 1));
+    return { x: p.x, y: p.y, a: Math.atan2(q.y - r.y, q.x - r.x) * 180 / Math.PI };
+  }
+  // Richting a een beetje naar richting t laten buigen (gewicht w).
+  function blend(a, t, w) {
+    return Math.atan2(Math.sin(rad(a)) * (1 - w) + Math.sin(rad(t)) * w,
+                      Math.cos(rad(a)) * (1 - w) + Math.cos(rad(t)) * w) * 180 / Math.PI;
+  }
+  // Welke kant (+1/-1) van een tak met richting a wijst omhoog?
+  const omhoog = a => Math.sin(rad(a + 90)) < Math.sin(rad(a - 90)) ? 1 : -1;
+
+  // Taps toelopende tak als gevulde vorm rond een middellijn.
+  function taper(path, w0, w1, shift = 0, scale = 1) {
+    const L = path.getTotalLength(), n = Math.max(10, Math.ceil(L / 5));
+    const left = [], right = [];
+    for (let i = 0; i <= n; i++) {
+      const l = L * i / n, p = path.getPointAtLength(l);
+      const q = path.getPointAtLength(Math.min(L, l + .5)), r = path.getPointAtLength(Math.max(0, l - .5));
+      let dx = q.x - r.x, dy = q.y - r.y; const m = Math.hypot(dx, dy) || 1; dx /= m; dy /= m;
+      const full = w0 + (w1 - w0) * Math.pow(i / n, .8);
+      const w = full * scale / 2, cx = p.x - dy * shift * full, cy = p.y + dx * shift * full;
+      left.push(`${(cx - dy * w).toFixed(1)} ${(cy + dx * w).toFixed(1)}`);
+      right.push(`${(cx + dy * w).toFixed(1)} ${(cy - dx * w).toFixed(1)}`);
+    }
+    return "M" + left.join(" L") + " L" + right.reverse().join(" L") + "Z";
+  }
+
+  let maskNr = 0;
+  // Tak met bast en lichte rand; groeit zichtbaar via een gestreept masker.
+  function tak(root, layer, d, w0, w1, box) {
+    const id = "m" + (maskNr++);
+    const mid = el("path", { d, fill: "none" }, layer);
+    const L = mid.getTotalLength();
+    const mask = el("mask", { id, maskUnits: "userSpaceOnUse", x: box[0], y: box[1], width: box[2], height: box[3] }, root);
+    const mp = el("path", { d, fill: "none", stroke: "#fff", "stroke-width": w0 + 10, "stroke-linecap": "round" }, mask);
+    mp.style.strokeDasharray = L + 2;
+    mp.style.strokeDashoffset = L + 2;
+    const g = el("g", { mask: `url(#${id})` }, layer);
+    el("path", { d: taper(mid, w0, w1), fill: BAST }, g);
+    el("path", { d: taper(mid, w0, w1, -.22, .32), fill: BAST_LICHT, opacity: .8 }, g);
+    return { mid, L, mp };
+  }
+
+  // ---------- Blad ----------
+  function blad(parent, x, y, len, rot, d = 0) {
+    const g = el("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)})` }, parent);
+    const b = el("g", { class: "grow leaf" }, g);
+    b.style.setProperty("--d", d.toFixed(2) + "s");
+    const a = len * .16, w = len * .22, tipY = -len * .05;
+    const donker = rnd() < .5 ? "#6f9060" : "#7c9b67";
+    el("path", { d: `M0 0 Q${a * .5} ${-a * .1} ${a + 2} 0`, stroke: "#5f7748", "stroke-width": Math.max(1.4, len * .045), fill: "none", "stroke-linecap": "round" }, b);
+    el("path", { d: `M${a} 0 C${a + len * .16} ${-w * 1.4} ${len * .68} ${-w * 1.3} ${len} ${tipY} Q${len * .55} ${-len * .015} ${a} 0Z`, fill: donker }, b);
+    el("path", { d: `M${a} 0 C${a + len * .2} ${w * 1.25} ${len * .72} ${w * 1.05} ${len} ${tipY} Q${len * .55} ${-len * .015} ${a} 0Z`, fill: "#9fb887" }, b);
+    el("path", { d: `M${a} 0 Q${len * .55} ${-len * .015} ${len * .96} ${tipY * .95}`, stroke: "rgba(255,255,255,.5)", "stroke-width": .9, fill: "none" }, b);
+    for (const t of [.25, .45, .65]) {
+      const vx = a + (len - a) * t, vy = tipY * t;
+      el("path", { d: `M${vx} ${vy} Q${vx + len * .06} ${vy - w * .5} ${vx + len * .14} ${vy - w * .85 * (1 - t * .5)}`, stroke: "rgba(255,255,255,.3)", "stroke-width": .7, fill: "none" }, b);
+      el("path", { d: `M${vx} ${vy} Q${vx + len * .06} ${vy + w * .45} ${vx + len * .14} ${vy + w * .75 * (1 - t * .5)}`, stroke: "rgba(255,255,255,.3)", "stroke-width": .7, fill: "none" }, b);
+    }
+    return b;
+  }
+
+  // ---------- Bloemkelkje ----------
+  function kroonblad(l, w) {
+    return `M0 0 C${-w * .45} ${-l * .18} ${-w * 1.15} ${-l * .5} ${-w * .6} ${-l * .88} Q0 ${-l * 1.08} ${w * .6} ${-l * .88} C${w * 1.15} ${-l * .5} ${w * .45} ${-l * .18} 0 0Z`;
+  }
+  // Voet op (x,y), wijst in richting ang (graden). Dicht als knopje, gaat open als 'opens'.
+  function kelk(parent, x, y, ang, s, k, o = {}) {
+    const open = o.open !== false, ped = o.ped ?? s * .75, d = o.d || 0;
+    const g = el("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(ang + 90).toFixed(1)})` }, parent);
+    const f = el("g", { class: "grow fl" + (open ? " opens" : "") }, g);
+    f.style.setProperty("--d", d.toFixed(2) + "s");
+    const buig = (rnd() - .5) * ped * .6;
+    el("path", { d: `M0 0 Q${buig} ${-ped * .55} 0 ${-ped}`, stroke: "#6a8456", "stroke-width": Math.max(1.4, s * .08), fill: "none", "stroke-linecap": "round" }, f);
+    const h = el("g", { transform: `translate(0 ${-ped})` }, f);
+    const blad = (c, oo, l, w, fill) => {
+      const p = el("path", { d: kroonblad(l, w), fill, class: "pt" }, h);
+      p.style.setProperty("--c", c + "deg");
+      p.style.setProperty("--o", oo + "deg");
+    };
+    const L = open ? s : s * .7;
+    blad(-10, -55, s * .34, s * .15, "#6f9060");
+    blad(10, 55, s * .34, s * .15, "#6f9060");
+    blad(-4, -18, L, L * .36, `url(#pb${k.i})`);
+    blad(4, 18, L, L * .36, `url(#pb${k.i})`);
+    blad(0, 0, L * 1.04, L * .36, `url(#pb${k.i})`);
+    if (open) {
+      const st = el("g", { class: "stam" }, h);
+      for (const a of [-11, 0, 11]) {
+        const ex = Math.sin(rad(a)) * L * .95, ey = -Math.cos(rad(a)) * L * .95;
+        el("path", { d: `M0 ${-L * .2} L${ex.toFixed(1)} ${ey.toFixed(1)}`, stroke: k.light, "stroke-width": 1 }, st);
+        el("circle", { cx: ex.toFixed(1), cy: ey.toFixed(1), r: Math.max(1.3, L * .055), fill: "#fff1c4" }, st);
+      }
+    }
+    blad(-6, -36, L * .94, L * .33, `url(#pf${k.i})`);
+    blad(6, 36, L * .94, L * .33, `url(#pf${k.i})`);
+    el("ellipse", { cx: 0, cy: -s * .03, rx: s * .12, ry: s * .08, fill: "#6a8456" }, h);
+    return f;
+  }
+
+  function smooth(pts) {
+    let d = `M${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    }
+    return d;
+  }
+
+  // Tros kelkjes aan het eind van een tak.
+  function tros(layer, path, s, d, items, y, aantal = 3) {
+    const e = at(path, 1);
+    const hoeken = aantal === 3 ? [0, -38, 36] : [0, -40, 38, -72, 70];
+    hoeken.forEach((h, j) => {
+      const ang = blend(e.a + h, -90, .2);
+      const node = kelk(layer, e.x, e.y, ang, s * (j === 0 ? 1 : .8 - j * .04), pick(KLEUR), { open: j < 3 || rnd() < .5, d: d + j * .15, ped: s * (j === 0 ? .9 : .65) });
+      items.push({ node, y });
+    });
+  }
+
+  // ---------- Voorkant: takje ----------
+  (function sprig() {
+    const s = document.getElementById("sprig");
+    seed = 11;
+    const back = el("g", {}, s), front = el("g", {}, s), box = [-40, -40, 360, 210];
+    const hoofd = tak(s, front, "M10 92 C80 62 170 58 266 78", 8, 2.5, box);
+    const zij = tak(s, front, "M140 66 C150 44 162 34 178 26", 4, 1.4, box);
+    const nodes = [hoofd.mp, zij.mp];
+    const p = f => at(hoofd.mid, f);
+    [[.12, 1, 34], [.3, -1, 30], [.58, 1, 36], [.78, -1, 28]].forEach(([f, k, len]) => {
+      const q = p(f); nodes.push(blad(back, q.x, q.y, len, blend(q.a + k * 60, 90, .15), .3 + f));
+    });
+    [[.2, 22, true], [.45, 18, false], [.68, 24, true], [.9, 17, false]].forEach(([f, sz, open]) => {
+      const q = p(f); nodes.push(kelk(back, q.x, q.y, blend(q.a - 70, -90, .4), sz, pick(KLEUR), { open, d: .5 + f }));
+    });
+    const e = at(zij.mid, 1);
+    nodes.push(kelk(back, e.x, e.y, blend(e.a, -90, .3), 26, KLEUR[0], { d: 1.1 }));
+    const e2 = at(hoofd.mid, 1);
+    nodes.push(kelk(back, e2.x, e2.y, e2.a - 10, 20, KLEUR[1], { d: 1.4 }));
+    [hoofd.mp, zij.mp].forEach((mp, i) => { mp.classList.add("reveal"); mp.style.setProperty("--d", (i * .6) + "s"); });
+    const go = () => nodes.forEach(n => n.classList.add("on"));
+    reduce ? go() : setTimeout(go, 250);
+  })();
+
+  document.getElementById("namen").innerHTML = WENSEN.map(w => `<li>${w.van}</li>`).join("");
+
+  // ---------- De tak ----------
+  const stage = document.getElementById("stage");
+  const svg = document.getElementById("takSvg");
+  let stem, samples = [], items = [], maxGrown = -Infinity, lastWidth = 0;
+
+  function lengthAtY(y) {
+    if (y <= samples[0].y) return 0;
+    if (y >= samples[samples.length - 1].y) return stem.L;
+    let lo = 0, hi = samples.length - 1;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; samples[m].y < y ? lo = m : hi = m; }
+    return samples[hi].l;
+  }
+
+  function build() {
+    seed = 7;
+    svg.innerHTML = "";
+    stage.querySelectorAll(".hang").forEach(n => n.remove());
+    items = [];
+
+    const W = stage.clientWidth;
+    const mobiel = W < 640;
+    const spacing = mobiel ? 470 : 420;
+    const top = 70;
+    const H = top + WENSEN.length * spacing + 170;
+    stage.style.height = H + "px";
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const box = [-200, -200, W + 400, H + 400];
+
+    const base = mobiel ? 26 : W / 2;
+    const amp = mobiel ? 9 : 42;
+    const stemX = y => base + amp * Math.sin(y / 230 + .6) + amp * .35 * Math.sin(y / 97);
+
+    const pts = [];
+    for (let y = -10; y <= H - 120; y += 55) pts.push([stemX(y), y]);
+
+    const achter = el("g", {}, svg);   // bladeren en kelkjes: hun voet zit achter de bast
+    const takken = el("g", {}, svg);
+    const add = (node, y) => items.push({ node, y });
+
+    stem = tak(svg, takken, smooth(pts), mobiel ? 12 : 17, mobiel ? 4 : 6, box);
+    samples = [];
+    for (let l = 0; l <= stem.L; l += 6) samples.push({ l, y: stem.mid.getPointAtLength(l).y });
+    samples.push({ l: stem.L, y: stem.mid.getPointAtLength(stem.L).y });
+
+    // Bladeren en kelkjes langs de stengel
+    let kant = 1, n = 0;
+    for (let y = 50; y < H - 170; y += mobiel ? 64 : 74, n++) {
+      const q = at(stem.mid, lengthAtY(y) / stem.L);
+      const links = Math.cos(rad(q.a + kant * 60)) < 0;
+      const len = mobiel ? (links ? 20 + rnd() * 6 : 30 + rnd() * 10) : 38 + rnd() * 18;
+      add(blad(achter, q.x, q.y, len, blend(q.a + kant * 62, 90, .12)), y);
+      if (n % 3 === 1) {
+        const k2 = mobiel ? (Math.cos(rad(q.a + 70)) > 0 ? 1 : -1) : -kant;
+        add(kelk(achter, q.x, q.y, blend(q.a + k2 * 70, -90, .3), mobiel ? 21 : 26, pick(KLEUR), { open: rnd() < .75, d: .2 }), y);
+      }
+      kant = -kant;
+    }
+
+    // Takje met tros, blaadjes en een zijscheutje
+    function zijtak(t, y, f0, opties) {
+      const { leaves, kelken, skip = [], grootte, scheut } = opties;
+      const vertraging = f => f0 + .15 + f * 1.1;
+      leaves.forEach(([f, k, len]) => {
+        if (skip.some(s => Math.abs(s - f) < .07)) return;
+        const q = at(t.mid, f);
+        add(blad(achter, q.x, q.y, len, blend(q.a + k * 58, 90, .15), vertraging(f)), y);
+      });
+      kelken.forEach(([f, open]) => {
+        if (skip.some(s => Math.abs(s - f) < .07)) return;
+        const q = at(t.mid, f), up = omhoog(q.a);
+        add(kelk(achter, q.x, q.y, blend(q.a + up * 68, -90, .3), grootte * .85, pick(KLEUR), { open, d: vertraging(f) }), y);
+      });
+      if (scheut) {
+        const q = at(t.mid, scheut.f), up = omhoog(q.a);
+        const dir = blend(q.a + up * 42, -90, .25), dir2 = blend(q.a + up * 20, -90, .1);
+        const ex = q.x + Math.cos(rad(dir)) * scheut.len, ey = q.y + Math.sin(rad(dir)) * scheut.len;
+        const cx = q.x + Math.cos(rad(dir2)) * scheut.len * .55, cy = q.y + Math.sin(rad(dir2)) * scheut.len * .55;
+        const s = tak(svg, takken, `M${q.x.toFixed(1)} ${q.y.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`, scheut.w, 1.4, box);
+        s.mp.classList.add("reveal");
+        s.mp.style.setProperty("--d", vertraging(scheut.f).toFixed(2) + "s");
+        add(s.mp, y);
+        const sf = vertraging(scheut.f) + .5;
+        const m = at(s.mid, .45);
+        add(blad(achter, m.x, m.y, grootte * 1.5, blend(m.a - up * 55, 90, .1), sf), y);
+        const m2 = at(s.mid, .7);
+        add(kelk(achter, m2.x, m2.y, blend(m2.a + up * 60, -90, .3), grootte * .6, pick(KLEUR), { open: false, d: sf + .2 }), y);
+        tros(achter, s.mid, grootte, sf + .4, items, y, 3);
+      }
+      tros(achter, t.mid, grootte, vertraging(1), items, y, mobiel ? 3 : 5);
+    }
+
+    WENSEN.forEach((w, i) => {
+      const y0 = top + i * spacing + spacing * .16;
+      const sx = stemX(y0);
+      const k = mobiel ? 1 : (i % 2 ? -1 : 1);
+      const tw = 140;
+
+      let ex, tx;
+      if (mobiel) { ex = W - 26; tx = 58 + (W - 58) / 2; }
+      else {
+        ex = clamp(sx + k * Math.min(370, W / 2 - 30), 30, W - 30);
+        tx = clamp(sx + k * Math.min(235, W / 2 - 150), tw / 2 + 8, W - tw / 2 - 8);
+      }
+      const ey = y0 + 44;
+      const d = `M${sx.toFixed(1)} ${y0} C${(sx + k * 70).toFixed(1)} ${y0 - 58} ${(ex - k * 120).toFixed(1)} ${y0 - 62} ${ex.toFixed(1)} ${ey}`;
+      const t = tak(svg, takken, d, mobiel ? 8 : 11, mobiel ? 2.2 : 2.8, box);
+      t.mp.classList.add("reveal");
+      add(t.mp, y0);
+
+      // Ophangpunt: het punt op de tak dat het dichtst bij de gewenste labelpositie ligt.
+      let best = null;
+      for (let f = .3; f <= .95; f += .01) {
+        const p = t.mid.getPointAtLength(t.L * f);
+        if (!best || Math.abs(p.x - tx) < Math.abs(best.p.x - tx)) best = { p, f };
+      }
+
+      const g = mobiel ? 25 : 32;
+      zijtak(t, y0, 0, {
+        grootte: g,
+        skip: [best.f],
+        leaves: mobiel
+          ? [[.14, 1, 30], [.3, -1, 32], [.6, 1, 28], [.86, 1, 26]]
+          : [[.12, 1, 44], [.26, -1, 50], [.52, 1, 46], [.66, -1, 40], [.88, 1, 36]],
+        kelken: [[.2, true], [.42, false], [.78, true]],
+        scheut: { f: mobiel ? .5 : .4, len: mobiel ? 60 : 92, w: mobiel ? 4 : 5 },
+      });
+
+      // Takje aan de andere kant (alleen breed scherm)
+      if (!mobiel) {
+        const oy = y0 + spacing * .5, ox = stemX(oy), o = -k;
+        const ox2 = clamp(ox + o * (170 + rnd() * 70), 30, W - 30), oy2 = oy + 56;
+        const od = `M${ox.toFixed(1)} ${oy} C${(ox + o * 50).toFixed(1)} ${oy - 34} ${(ox2 - o * 70).toFixed(1)} ${oy2 - 46} ${ox2.toFixed(1)} ${oy2}`;
+        const ot = tak(svg, takken, od, 8, 2.2, box);
+        ot.mp.classList.add("reveal");
+        add(ot.mp, oy);
+        zijtak(ot, oy, 0, {
+          grootte: 28,
+          leaves: [[.18, 1, 42], [.36, -1, 46], [.62, 1, 38], [.8, -1, 34]],
+          kelken: [[.5, true], [.7, false]],
+        });
+      }
+
+      // Het label aan het touwtje
+      const hp = best.p;
+      const hang = document.createElement("div");
+      hang.className = "hang";
+      hang.style.left = hp.x + "px";
+      hang.style.top = (hp.y + 2) + "px";
+      hang.style.setProperty("--lengte", (mobiel ? 290 : 310) + "px");
+      hang.style.setProperty("--len", (44 + (i % 3) * 16) + "px");
+      hang.style.setProperty("--rot", ((rnd() - .5) * 6).toFixed(1) + "deg");
+      hang.style.setProperty("--swing", (4.8 + rnd() * 1.6).toFixed(1) + "s");
+      hang.style.setProperty("--delay", (.4 + best.f * 1.1).toFixed(2) + "s");
+      const isPlaceholder = w.wens.startsWith("Hier komt");
+      hang.innerHTML = `<div class="touw"></div><article class="label${isPlaceholder ? " placeholder" : ""}"><span class="gat"></span><p class="wens"></p><p class="van"></p></article>`;
+      hang.querySelector(".wens").textContent = w.wens;
+      hang.querySelector(".van").textContent = w.groet || "— " + w.van;
+      stage.appendChild(hang);
+      add(hang, y0 + 20);
+    });
+
+    // Grote tros aan het eind van de stengel
+    const e = at(stem.mid, 1);
+    tros(achter, stem.mid, mobiel ? 24 : 30, .2, items, e.y - 20, 5);
+    const e2 = at(stem.mid, .97);
+    add(blad(achter, e2.x, e2.y, mobiel ? 34 : 48, e2.a + 70, .1), e.y - 20);
+    add(blad(achter, e2.x, e2.y, mobiel ? 30 : 44, e2.a - 70, .2), e.y - 20);
+
+    lastWidth = W;
+    update();
+  }
+
+  function update() {
+    const rect = stage.getBoundingClientRect();
+    const grown = reduce ? Infinity : innerHeight * .64 - rect.top;
+    maxGrown = Math.max(maxGrown, grown);
+    stem.mp.style.strokeDashoffset = stem.L + 2 - lengthAtY(maxGrown);
+    for (const it of items) if (it.y < maxGrown) it.node.classList.add("on");
+  }
+
+  build();
+  addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+  let rt;
+  addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { if (stage.clientWidth !== lastWidth) build(); else update(); }, 150);
+  });
+  if (document.fonts) document.fonts.ready.then(update);
+</script>
