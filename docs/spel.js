@@ -40,16 +40,16 @@
   const basis = { skin: "#f2c6a8", legs: "#3a3a4a", shoes: "#2a2030" };
   const WENDY = { ...basis, hair: "#8a6a45", hairHi: "#ad8a5c", top: "#c2557f", topLo: "#963c63", legs: "#4a5a8a", shoes: "#3e2340", stijl: "lang" };
   const LOOKS = {
-    Mirjam: { ...basis, hair: "#c9c5c0", hairHi: "#e8e5e1", top: "#5b4a78", topLo: "#43365c", stijl: "bob", bril: "#2a1f2a" },
+    Mirjam: { ...basis, hair: "#cfccc6", hairHi: "#eeebe6", top: "#3a2e34", topLo: "#2a2026", stijl: "bob", bril: "#5a3a2a" },
     Eelco:  { ...basis, hair: "#9a8f86", hairHi: "#b3aaa2", top: "#8fb3dd", topLo: "#6f93c0", stijl: "kaal", baard: "#a39a92", bril: "#1f1a1f" },
-    Sabine: { ...basis, hair: "#e2c27a", hairHi: "#f2dca0", top: "#2f3550", topLo: "#23283d", stijl: "lang" },
+    Sabine: { ...basis, hair: "#e8cf8e", hairHi: "#f6e4b4", top: "#7a2a45", topLo: "#5e2035", streep: "#bcd3e3", stijl: "lang" },
     Colin:  { ...basis, hair: "#7a5c45", hairHi: "#93745c", top: "#6b8fbf", topLo: "#52739f", stijl: "kort", bril: "#7d7a7a" },
     Renee:  { ...basis, hair: "#e6c98a", hairHi: "#f5e1ad", top: "#7a2f45", topLo: "#5e2335", stijl: "lang" },
     Chris:  { ...basis, hair: "#b8a98a", hairHi: "#d3c6a8", top: "#4a3f7a", topLo: "#382f60", stijl: "krul", baard: "#a8977a" },
-    Jan:    { ...basis, hair: "#e3c27a", hairHi: "#f2dca0", top: "#2a3550", topLo: "#1e273d", stijl: "kort", bril: "#3a3030" },
+    Jan:    { ...basis, hair: "#dcc08a", hairHi: "#efdcb2", top: "#6e2433", topLo: "#521a26", stijl: "halflang", bril: "#5a4a40" },
     Thomas: { ...basis, hair: "#9a7a55", hairHi: "#b39470", top: "#283350", topLo: "#1d253c", stijl: "kort", bril: "#2a2020" },
     David:  { ...basis, hair: "#a8a49e", hairHi: "#c4c0ba", top: "#2a2a2e", topLo: "#1c1c20", stijl: "kort" },
-    Dave:   { ...basis, hair: "#4e3a2e", hairHi: "#6a5244", top: "#5e8f6e", topLo: "#477056", stijl: "kort" },
+    Dave:   { ...basis, hair: "#7d5f40", hairHi: "#9a7a55", top: "#f0d6d2", topLo: "#d9bcb7", legs: "#2a3550", shoes: "#1f1f24", stijl: "kort", zonnebril: "#1a1a1e", shorts: true },
   };
   const TEAM = ["Mirjam", "Eelco", "Sabine", "Colin", "Renee", "Chris", "Jan", "Thomas", "David", "Dave"];
   const HOERA = ["Hoera, Wendy!", "Liefs!", "Knap gedaan!", "Taart voor jou!", "Sterkte, Wendy!", "Je kunt het!", "Dikke knuffel!", "Zo trots!", "Hiep hoi!", "Feest!"];
@@ -509,14 +509,12 @@
       `${bloemen} bloemen · ${kaarten.size} van ${totaalKaarten} kaartjes · ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
     const w = (typeof WENSEN !== "undefined" ? WENSEN : []).find(x => x.van === L.host && !x.wens.startsWith("Hier komt"));
     const label = document.getElementById("spelLabel");
+    // Alleen een label als dit teamlid een wens op de kaart heeft.
     if (w) {
       document.getElementById("spelWens").textContent = w.wens;
       document.getElementById("spelVan").textContent = w.groet || "— " + w.van;
-    } else {
-      document.getElementById("spelWens").textContent = `De wens van ${L.host} hangt hier binnenkort.`;
-      document.getElementById("spelVan").textContent = "— " + L.host;
     }
-    label.hidden = false;
+    label.hidden = !w;
     let extra;
     if (laatste) {
       const totaal = Object.values(voortgang.klaar).reduce((a, b) => a + b, 0);
@@ -701,10 +699,13 @@
     else { r(5 - arm, 10, 2, 5, L.topLo); r(5 - arm, 15, 2, 1, L.skin); }
     r(6 + lb, 16, 2, 5 - tb, L.legs); r(6 + lb, 21 - tb, 3, 1, L.shoes);
     r(5, 9, 6, 7, L.top); r(5, 9, 1, 7, L.topLo); r(7, 8, 2, 1, L.skin);
+    if (L.streep) { r(5, 10, 6, 1, L.streep); r(5, 12, 6, 1, L.streep); r(5, 14, 6, 1, L.streep); }
     r(8 + la, 16, 2, 5 - ta, L.legs); r(8 + la, 21 - ta, 3, 1, L.shoes);
+    if (L.shorts) { r(6 + lb, 19, 2, 2 - tb, L.skin); r(8 + la, 19, 2, 2 - ta, L.skin); }
     r(5, 2, 6, 6, L.skin);
     r(9, 4, 1, 1, C.ink); r(10, 6, 1, 1, "#c9677f"); r(10, 5, 1, 1, "#f3a7b5");
     if (L.baard) { r(6, 6, 5, 2, L.baard); r(10, 6, 1, 1, "#c9677f"); }
+    if (L.zonnebril) { r(7, 4, 4, 2, L.zonnebril); r(6, 4, 1, 1, L.zonnebril); r(8, 4, 1, 1, "#4a4a55"); }
     if (L.bril) { r(8, 3, 3, 1, L.bril); r(8, 5, 3, 1, L.bril); r(8, 3, 1, 3, L.bril); r(10, 3, 1, 3, L.bril); r(6, 4, 2, 1, L.bril); }
     switch (L.stijl) {
       case "lang":
@@ -716,6 +717,9 @@
         break;
       case "kort":
         r(4, 0, 7, 2, L.hair); r(4, 2, 2, 3, L.hair); r(5, 0, 3, 1, L.hairHi);
+        break;
+      case "halflang":
+        r(4, 0, 7, 2, L.hair); r(5, 0, 4, 1, L.hairHi); r(3, 1, 3, 5, L.hair); r(10, 1, 1, 3, L.hair); r(6, 2, 3, 1, L.hair);
         break;
       case "kaal":
         r(5, 1, 6, 1, L.skin); r(6, 1, 3, 1, "#f8d8c0"); r(4, 3, 2, 3, L.hair);

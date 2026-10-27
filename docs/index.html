@@ -447,17 +447,15 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
 
 <script>
-  // Vul hier de wensen in. Volgorde = volgorde aan de tak.
+  // Vul hier de wensen in. Volgorde = volgorde aan de tak (zelfde volgorde als de levels in het spel).
   const WENSEN = [
     // 'groet' (optioneel) vervangt de ondertekening "— naam" onderaan het label.
     { van: "Mirjam", wens: "Beste Wendy,\nDit is even schrikken! Veel sterkte komende tijd,", groet: "hartelijke groet, Mirjam" },
-    { van: "Teamlid 2", wens: "Hier komt de wens van teamlid 2." },
-    { van: "Teamlid 3", wens: "Hier komt de wens van teamlid 3." },
-    { van: "Teamlid 4", wens: "Hier komt de wens van teamlid 4." },
-    { van: "Teamlid 5", wens: "Hier komt de wens van teamlid 5." },
     { van: "Eelco", wens: "Lieve Wendy, was even stil van het nieuws. Heel veel sterkte en liefs voor jou en je gezin de komende tijd,", groet: "liefs, Eelco" },
-    { van: "Teamlid 7", wens: "Hier komt de wens van teamlid 7." },
-    { van: "Teamlid 8", wens: "Hier komt de wens van teamlid 8." },
+    { van: "Sabine", wens: "Beste Wendy,\nVan harte beterschap en veel sterkte in de komende tijd!", groet: "Sabine" },
+    { van: "Jan", wens: "Hoi Wendy, wat een naar bericht! Heel veel sterkte de komende tijd!", groet: "Jan" },
+    { van: "Thomas", wens: "Lieve Wendy, wat enorm schrikken dit nieuws. Heel veel sterkte de komende tijd!", groet: "Groet, Thomas" },
+    { van: "Dave", wens: "Hé Wendy,\nHeel veel sterkte de komende tijd. We duimen voor je!", groet: "Groetjes, Dave" },
   ];
 
   // Kelkkleuren: diep (voet van het blad), midden, licht (punt).
@@ -544,7 +542,11 @@
   }
 
   // ---------- Blad ----------
+  // Vergroting voor de grote tak (de voorkant houdt schaal 1).
+  let SCHAAL_BLAD = 1, SCHAAL_KELK = 1;
+
   function blad(parent, x, y, len, rot, d = 0) {
+    len *= SCHAAL_BLAD;
     const g = el("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot.toFixed(1)})` }, parent);
     const b = el("g", { class: "grow leaf" }, g);
     b.style.setProperty("--d", d.toFixed(2) + "s");
@@ -568,6 +570,7 @@
   }
   // Voet op (x,y), wijst in richting ang (graden). Dicht als knopje, gaat open als 'opens'.
   function kelk(parent, x, y, ang, s, k, o = {}) {
+    s *= SCHAAL_KELK;
     const open = o.open !== false, ped = o.ped ?? s * .75, d = o.d || 0;
     const g = el("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(ang + 90).toFixed(1)})` }, parent);
     const f = el("g", { class: "grow fl" + (open ? " opens" : "") }, g);
@@ -669,6 +672,8 @@
 
     const W = stage.clientWidth;
     const mobiel = W < 640;
+    SCHAAL_BLAD = mobiel ? 1.25 : 1.4;
+    SCHAAL_KELK = mobiel ? 1.2 : 1.3;
     const spacing = mobiel ? 470 : 420;
     const top = 70;
     const H = top + WENSEN.length * spacing + 170;
